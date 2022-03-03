@@ -4,21 +4,24 @@ import { Constants } from '~/util/Constants'
 export default class Game extends Phaser.Scene {
   private lettersTyped: string[] = []
   private lettersToType: Phaser.GameObjects.Text[] = []
-  private textCorpus: String[] = Constants.TEXT.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, '').split(
+  private textCorpus: string[] = Constants.TEXT.replace(/[.,\/#'?!$%\^&\*;:{}=\-_`~()]/g, '').split(
     ' '
   )
   private textCorpusIndex: number = 0
+  private previousWord: Phaser.GameObjects.Text | null = null
+  private nextWord!: Phaser.GameObjects.Text
 
   constructor() {
     super('game')
   }
 
   create() {
-    this.displayWord()
+    this.updateCurrWord()
+    this.updateNextWord()
     this.handleInput()
   }
 
-  displayWord() {
+  updateCurrWord() {
     const word = this.textCorpus[this.textCorpusIndex].toUpperCase()
     if (!word) {
       return
@@ -41,6 +44,32 @@ export default class Game extends Phaser.Scene {
     })
   }
 
+  getCurrWordWidth() {
+    return this.lettersToType.reduce((acc, curr) => {
+      return acc + curr.displayWidth
+    }, 0)
+  }
+
+  updateNextWord() {
+    if (this.textCorpusIndex + 1 < this.textCorpus.length) {
+      const widthOfCurrWord = this.getCurrWordWidth()
+      const firstLetter = this.lettersToType[0]
+      const spacingOffset = 50
+      const nextWordToType = this.textCorpus[this.textCorpusIndex + 1].toUpperCase()
+      if (!this.nextWord) {
+        this.nextWord = this.add.text(0, 0, nextWordToType, {
+          fontSize: '30px',
+        })
+        this.nextWord.setPosition(firstLetter.x + widthOfCurrWord + spacingOffset, 105)
+      } else {
+        this.nextWord.setText(nextWordToType)
+        this.nextWord.setPosition(firstLetter.x + widthOfCurrWord + spacingOffset, 105)
+      }
+    } else {
+      this.nextWord.setText('')
+    }
+  }
+
   handleInput() {
     const keys = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').map((k) => `Key${k}`)
     this.input.keyboard.on('keydown', (e) => {
@@ -52,11 +81,44 @@ export default class Game extends Phaser.Scene {
         this.lettersTyped.pop()
       }
       if (this.lettersTyped.length === this.lettersToType.length) {
-        this.textCorpusIndex++
-        this.lettersTyped = []
-        this.displayWord()
+        this.gotoNextWord()
       }
     })
+  }
+
+  updatePrevWord(prevWordTyped: string) {
+    if (this.textCorpusIndex > 0) {
+      const firstLetter = this.lettersToType[0]
+      const spacingOffset = 50
+      const prevWord = this.textCorpus[this.textCorpusIndex - 1].toUpperCase()
+      if (!this.previousWord) {
+        this.previousWord = this.add
+          .text(0, 0, prevWord, {
+            fontSize: '30px',
+          })
+          .setTintFill(prevWordTyped === prevWord ? 0x00ff00 : 0xff0000)
+        this.previousWord.setPosition(
+          firstLetter.x - this.previousWord.displayWidth - spacingOffset,
+          105
+        )
+      } else {
+        this.previousWord
+          .setText(prevWord)
+          .setPosition(firstLetter.x - this.previousWord.displayWidth - spacingOffset, 105)
+          .setTintFill(prevWordTyped === prevWord ? 0x00ff00 : 0xff0000)
+      }
+    }
+  }
+
+  gotoNextWord() {
+    const prevWordTyped = this.lettersTyped.join('')
+    this.textCorpusIndex++
+    this.lettersTyped = []
+    if (this.textCorpusIndex < this.textCorpus.length) {
+      this.updateCurrWord()
+      this.updateNextWord()
+      this.updatePrevWord(prevWordTyped)
+    }
   }
 
   highlightWordToType() {
