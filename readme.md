@@ -1,3 +1,3 @@
-# Phaser 3 Typescript Boilerplate
+# Book Master
 
-- Based on Ourcade's boilerplate, with a few additional modifications to support DOM element UI out of the box, as well as some package.json version configurations to support easy deployment with Netlify
+Become the greatest novelist of all time and type like your life depends on it. Because it does.
