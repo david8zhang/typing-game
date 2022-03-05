@@ -14,6 +14,11 @@ export default class Game extends Phaser.Scene {
   create() {
     this.inputHandler = new InputHandler(this)
     this.fanMeter = new FanMeter(this)
+    this.inputHandler.addOnNextWordHandler((isCorrect: boolean) => {
+      if (isCorrect) {
+        this.fanMeter.decreasePoints(Constants.CORRECT_WORD_SCORE)
+      }
+    })
   }
 
   update() {

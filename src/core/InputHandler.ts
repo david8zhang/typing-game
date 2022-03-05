@@ -2,13 +2,15 @@ import { Constants } from '~/util/Constants'
 
 export class InputHandler {
   private game: Phaser.Scene
-  private lettersTyped: string[] = []
+  private lettersTyped: Phaser.GameObjects.Text[] = []
   private lettersToType: Phaser.GameObjects.Text[] = []
   private textCorpus: string[] = []
   private textCorpusIndex: number = 0
   private previousWord: Phaser.GameObjects.Text | null = null
   private nextWord!: Phaser.GameObjects.Text
   private onNextWordHandlers: Function[] = []
+
+  private didGoToNextWord: boolean = false
 
   constructor(game: Phaser.Scene) {
     this.game = game
@@ -75,15 +77,51 @@ export class InputHandler {
     this.game.input.keyboard.on('keydown', (e) => {
       const keyPressed = e.key
       if (keyPressed.length == 1 && keyPressed != ' ') {
-        this.lettersTyped.push(keyPressed)
+        this.didGoToNextWord = false
+        this.addTypedLetter(keyPressed)
       }
       if (e.code == 'Backspace') {
-        this.lettersTyped.pop()
+        this.removeTypedLetter()
       }
-      if (e.code == 'Space') {
+      if (e.code == 'Space' && !this.didGoToNextWord) {
+        this.didGoToNextWord = true
         this.gotoNextWord()
       }
     })
+  }
+
+  addTypedLetter(letter: string) {
+    const letterObj = this.game.add
+      .text(0, 0, letter, {
+        fontSize: '40px',
+      })
+      .setDepth(100)
+    this.lettersTyped.push(letterObj)
+    const totalWidth = this.lettersTyped.reduce((acc, curr) => {
+      return acc + curr.displayWidth
+    }, 0)
+    this.lettersTyped.forEach((obj, index) => {
+      obj.setPosition(
+        Constants.GAME_WIDTH / 2 - totalWidth / 2 + obj.displayWidth * index,
+        Constants.GAME_HEIGHT / 2 - 100
+      )
+    })
+  }
+
+  removeTypedLetter() {
+    const letterToDelete = this.lettersTyped.pop()
+    if (letterToDelete) {
+      letterToDelete?.destroy()
+      const totalWidth = this.lettersTyped.reduce((acc, curr) => {
+        return acc + curr.displayWidth
+      }, 0)
+      this.lettersTyped.forEach((obj, index) => {
+        obj.setPosition(
+          Constants.GAME_WIDTH / 2 - totalWidth / 2 + obj.displayWidth * index,
+          Constants.GAME_HEIGHT / 2 - 100
+        )
+      })
+    }
   }
 
   updatePrevWord(prevWordTyped: string) {
@@ -111,9 +149,16 @@ export class InputHandler {
   }
 
   gotoNextWord() {
-    const prevWordToType = this.lettersToType.join('')
-    const prevWordTyped = this.lettersTyped.join('')
+    const prevWordToType = this.lettersToType.reduce((acc, curr) => {
+      return acc + curr.text
+    }, '')
+    const prevWordTyped = this.lettersTyped.reduce((acc, curr) => {
+      return acc + curr.text
+    }, '')
     this.textCorpusIndex++
+    this.lettersToType.forEach((o) => o.destroy())
+    this.lettersTyped.forEach((o) => o.destroy())
+    this.lettersToType = []
     this.lettersTyped = []
     if (this.textCorpusIndex < this.textCorpus.length) {
       this.updateCurrWord()
@@ -129,7 +174,7 @@ export class InputHandler {
     this.lettersToType.forEach((letter, index) => {
       const typed = this.lettersTyped[index]
       if (typed) {
-        letter.setTintFill(letter.text == typed ? 0x00ff00 : 0xff0000)
+        letter.setTintFill(letter.text == typed.text ? 0x00ff00 : 0xff0000)
       } else {
         letter.setTintFill(0xffffff)
       }

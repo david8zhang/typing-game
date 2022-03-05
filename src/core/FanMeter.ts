@@ -9,6 +9,7 @@ export class FanMeter {
     this.game = game
     this.frustrationBar = new Healthbar(this.game, {
       maxHealth: 100,
+      currHealth: 0,
       length: Constants.GAME_WIDTH - 50,
       width: 25,
       position: {
@@ -16,5 +17,16 @@ export class FanMeter {
         y: 25,
       },
     })
+    this.game.time.addEvent({
+      repeat: -1,
+      callback: () => {
+        this.frustrationBar.increaseHealth(Constants.HEALTH_DECREASE_RATE)
+      },
+      delay: 250,
+    })
+  }
+
+  decreasePoints(points: number) {
+    this.frustrationBar.decreaseHealth(points)
   }
 }

@@ -2,6 +2,7 @@ import Game from '~/scenes/Game'
 
 export interface HealthBarConfig {
   maxHealth: number
+  currHealth: number
   length: number
   width: number
   position: {
@@ -26,7 +27,7 @@ export class Healthbar {
 
   constructor(scene: Game, healthbarConfig: HealthBarConfig) {
     this.scene = scene
-    this.currHealth = healthbarConfig.maxHealth
+    this.currHealth = healthbarConfig.currHealth
     this.maxHealth = healthbarConfig.maxHealth
     this.length = healthbarConfig.length
     this.width = healthbarConfig.width
@@ -56,6 +57,7 @@ export class Healthbar {
 
   decreaseHealth(amount: number): void {
     this.currHealth -= amount
+    this.currHealth = Math.max(this.currHealth, 0)
     this.onHealthDecreased.forEach((handler) => handler())
     this.draw()
     if (this.currHealth <= 0) {
@@ -72,11 +74,11 @@ export class Healthbar {
     this.bar.fillRect(this.position.x - this.length / 2, this.position.y, this.length, this.width)
 
     if (percentage <= 0.33) {
-      this.bar.fillStyle(0xff0000)
+      this.bar.fillStyle(0x2ecc71)
     } else if (percentage <= 0.67) {
       this.bar.fillStyle(0xf1c40f)
     } else {
-      this.bar.fillStyle(0x2ecc71)
+      this.bar.fillStyle(0xff0000)
     }
 
     // Draw a colored rectangle to represent health
