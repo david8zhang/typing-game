@@ -9,19 +9,40 @@ export class InputHandler {
   private previousWord: Phaser.GameObjects.Text | null = null
   private nextWord!: Phaser.GameObjects.Text
   private onNextWordHandlers: Function[] = []
+  private onFinishedBookHandlers: Function[] = []
 
   private didGoToNextWord: boolean = false
+  private wordCountText!: Phaser.GameObjects.Text
+  private typedWords: string[] = []
 
   constructor(game: Phaser.Scene) {
     this.game = game
-    this.textCorpus = Constants.TEXT.split(' ')
+    this.textCorpus = Constants.TEXT.split(' ').slice(0, 10)
     this.updateCurrWord()
     this.updateNextWord()
     this.handleInput()
+    this.updateWordCount()
   }
 
   addOnNextWordHandler(fn: Function) {
     this.onNextWordHandlers.push(fn)
+  }
+
+  addOnFinishedBookHandler(fn: Function) {
+    this.onFinishedBookHandlers.push(fn)
+  }
+
+  updateWordCount() {
+    const text = `${this.textCorpusIndex}/${this.textCorpus.length}`
+    if (!this.wordCountText) {
+      this.wordCountText = this.game.add.text(Constants.GAME_WIDTH - 100, 75, text, {
+        fontSize: '15px',
+        fontStyle: 'italic',
+      })
+      console.log(this.wordCountText)
+    } else {
+      this.wordCountText.setText(text)
+    }
   }
 
   updateCurrWord() {
@@ -164,8 +185,15 @@ export class InputHandler {
       this.updateCurrWord()
       this.updateNextWord()
       this.updatePrevWord(prevWordTyped)
+      this.updateWordCount()
+      this.typedWords.push(prevWordTyped)
       this.onNextWordHandlers.forEach((handler) => {
         handler(prevWordToType === prevWordTyped)
+      })
+    } else {
+      this.typedWords.push(prevWordTyped)
+      this.onFinishedBookHandlers.forEach((handler) => {
+        handler(this.typedWords, this.textCorpus)
       })
     }
   }

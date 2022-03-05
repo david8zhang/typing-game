@@ -19,6 +19,12 @@ export default class Game extends Phaser.Scene {
         this.fanMeter.decreasePoints(Constants.CORRECT_WORD_SCORE)
       }
     })
+    this.inputHandler.addOnFinishedBookHandler((wordsTyped: string[], textCorpus: string[]) => {
+      this.scene.start('book-finished', {
+        wordsTyped,
+        textCorpus,
+      })
+    })
   }
 
   update() {
