@@ -2,6 +2,7 @@ import Phaser from 'phaser'
 import BookFinished from './scenes/BookFinished'
 
 import Game from './scenes/Game'
+import { GameOver } from './scenes/GameOver'
 
 const config: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
@@ -23,7 +24,7 @@ const config: Phaser.Types.Core.GameConfig = {
     mode: Phaser.Scale.FIT,
     autoCenter: Phaser.Scale.CENTER_BOTH,
   },
-  scene: [Game, BookFinished],
+  scene: [Game, BookFinished, GameOver],
 }
 
 export default new Phaser.Game(config)

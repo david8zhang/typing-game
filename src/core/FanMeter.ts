@@ -24,6 +24,9 @@ export class FanMeter {
       },
       delay: 250,
     })
+    this.frustrationBar.setOnLoseAllHealthHandler(() => {
+      this.game.onGameOver()
+    })
   }
 
   decreasePoints(points: number) {

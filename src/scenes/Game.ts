@@ -1,7 +1,7 @@
 import Phaser from 'phaser'
 import { FanMeter } from '~/core/FanMeter'
-import { Healthbar } from '~/core/Health'
 import { InputHandler } from '~/core/InputHandler'
+import { TextGenerator } from '~/core/TextGenerator'
 import { Constants } from '~/util/Constants'
 
 export default class Game extends Phaser.Scene {
@@ -12,7 +12,7 @@ export default class Game extends Phaser.Scene {
   }
 
   create() {
-    this.inputHandler = new InputHandler(this)
+    this.inputHandler = new InputHandler(this, TextGenerator.generateText(100))
     this.fanMeter = new FanMeter(this)
     this.inputHandler.addOnNextWordHandler((isCorrect: boolean) => {
       if (isCorrect) {
@@ -25,6 +25,10 @@ export default class Game extends Phaser.Scene {
         textCorpus,
       })
     })
+  }
+
+  onGameOver() {
+    this.scene.start('game-over')
   }
 
   update() {

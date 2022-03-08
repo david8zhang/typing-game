@@ -15,9 +15,9 @@ export class InputHandler {
   private wordCountText!: Phaser.GameObjects.Text
   private typedWords: string[] = []
 
-  constructor(game: Phaser.Scene) {
+  constructor(game: Phaser.Scene, textCorpus: string[]) {
     this.game = game
-    this.textCorpus = Constants.TEXT.split(' ').slice(0, 10)
+    this.textCorpus = textCorpus
     this.updateCurrWord()
     this.updateNextWord()
     this.handleInput()

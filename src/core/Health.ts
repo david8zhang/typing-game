@@ -52,6 +52,9 @@ export class Healthbar {
 
   increaseHealth(amount: number): void {
     this.currHealth = Math.min(this.maxHealth, this.currHealth + amount)
+    if (this.currHealth === this.maxHealth) {
+      this.onLoseAllHealthHandler()
+    }
     this.draw()
   }
 
@@ -60,9 +63,6 @@ export class Healthbar {
     this.currHealth = Math.max(this.currHealth, 0)
     this.onHealthDecreased.forEach((handler) => handler())
     this.draw()
-    if (this.currHealth <= 0) {
-      this.onLoseAllHealthHandler()
-    }
   }
 
   draw(): void {
