@@ -33,5 +33,21 @@ export default class BookFinished extends Phaser.Scene {
       Constants.GAME_WIDTH / 2 - accuracyText.displayWidth / 2,
       Constants.GAME_HEIGHT / 2 + accuracyText.displayHeight
     )
+
+    const inputText = this.add.text(0, 0, 'Press Space to Continue', {
+      fontSize: '20px',
+    })
+    inputText.setPosition(
+      Constants.GAME_WIDTH / 2 - inputText.displayWidth / 2,
+      accuracyText.y + inputText.displayHeight
+    )
+
+    this.input.keyboard.on('keydown', (e) => {
+      if (e.code === 'Space') {
+        this.scene.start('game', {
+          bookFinished: 1,
+        })
+      }
+    })
   }
 }

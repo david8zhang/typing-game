@@ -7,12 +7,21 @@ import { Constants } from '~/util/Constants'
 export default class Game extends Phaser.Scene {
   private inputHandler!: InputHandler
   private fanMeter!: FanMeter
+  private booksFinished: number = 0
+
   constructor() {
     super('game')
   }
 
+  init(data) {
+    if (data.bookFinished) {
+      this.booksFinished += data.bookFinished
+      console.log(this.booksFinished)
+    }
+  }
+
   create() {
-    this.inputHandler = new InputHandler(this, TextGenerator.generateText(100))
+    this.inputHandler = new InputHandler(this, TextGenerator.generateText(10))
     this.fanMeter = new FanMeter(this)
     this.inputHandler.addOnNextWordHandler((isCorrect: boolean) => {
       if (isCorrect) {
