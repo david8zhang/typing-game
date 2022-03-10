@@ -39,7 +39,6 @@ export class InputHandler {
         fontSize: '15px',
         fontStyle: 'italic',
       })
-      console.log(this.wordCountText)
     } else {
       this.wordCountText.setText(text)
     }
