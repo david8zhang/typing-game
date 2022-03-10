@@ -2,13 +2,14 @@ import { Constants } from '~/util/Constants'
 
 export default class BookFinished extends Phaser.Scene {
   private accuracy: number = 0
+  private wordsPerMinute: number = 0
 
   constructor() {
     super('book-finished')
   }
 
   init(data) {
-    const { wordsTyped, textCorpus } = data
+    const { wordsTyped, textCorpus, secondsPassed } = data
     let numCorrect = 0
     wordsTyped.forEach((word, index) => {
       if (word == textCorpus[index]) {
@@ -16,6 +17,8 @@ export default class BookFinished extends Phaser.Scene {
       }
     })
     this.accuracy = Math.round((numCorrect / textCorpus.length) * 100)
+    const minutes = secondsPassed / 60
+    this.wordsPerMinute = Math.round(wordsTyped.length / minutes)
   }
 
   create() {
@@ -34,12 +37,20 @@ export default class BookFinished extends Phaser.Scene {
       Constants.GAME_HEIGHT / 2 + accuracyText.displayHeight
     )
 
+    const wordsPerMinuteText = this.add.text(0, 0, `Words per minute: ${this.wordsPerMinute}`, {
+      fontSize: '20px',
+    })
+    wordsPerMinuteText.setPosition(
+      Constants.GAME_WIDTH / 2 - wordsPerMinuteText.displayWidth / 2,
+      accuracyText.y + wordsPerMinuteText.displayHeight
+    )
+
     const inputText = this.add.text(0, 0, 'Press Space to Continue', {
       fontSize: '20px',
     })
     inputText.setPosition(
       Constants.GAME_WIDTH / 2 - inputText.displayWidth / 2,
-      accuracyText.y + inputText.displayHeight
+      wordsPerMinuteText.y + inputText.displayHeight
     )
 
     this.input.keyboard.on('keydown', (e) => {

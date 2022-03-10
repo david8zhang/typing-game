@@ -8,6 +8,7 @@ export default class Game extends Phaser.Scene {
   private inputHandler!: InputHandler
   private fanMeter!: FanMeter
   private booksFinished: number = 0
+  private secondsPassed = 0
 
   constructor() {
     super('game')
@@ -16,13 +17,16 @@ export default class Game extends Phaser.Scene {
   init(data) {
     if (data.bookFinished) {
       this.booksFinished += data.bookFinished
-      console.log(this.booksFinished)
+      this.secondsPassed = 0
     }
   }
 
   create() {
-    this.inputHandler = new InputHandler(this, TextGenerator.generateText(10))
-    this.fanMeter = new FanMeter(this)
+    this.inputHandler = new InputHandler(
+      this,
+      TextGenerator.generateText(5 * (this.booksFinished + 1))
+    )
+    this.fanMeter = new FanMeter(this, this.booksFinished)
     this.inputHandler.addOnNextWordHandler((isCorrect: boolean) => {
       if (isCorrect) {
         this.fanMeter.decreasePoints(Constants.CORRECT_WORD_SCORE)
@@ -32,7 +36,15 @@ export default class Game extends Phaser.Scene {
       this.scene.start('book-finished', {
         wordsTyped,
         textCorpus,
+        secondsPassed: this.secondsPassed,
       })
+    })
+    this.time.addEvent({
+      delay: 1000,
+      callback: () => {
+        this.secondsPassed++
+      },
+      repeat: -1,
     })
   }
 

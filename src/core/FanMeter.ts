@@ -5,7 +5,9 @@ import { Healthbar } from './Health'
 export class FanMeter {
   private game: Game
   private frustrationBar: Healthbar
-  constructor(game: Game) {
+  private frustrationEvent: Phaser.Time.TimerEvent
+
+  constructor(game: Game, booksFinished: number) {
     this.game = game
     this.frustrationBar = new Healthbar(this.game, {
       maxHealth: 100,
@@ -17,12 +19,12 @@ export class FanMeter {
         y: 25,
       },
     })
-    this.game.time.addEvent({
+    this.frustrationEvent = this.game.time.addEvent({
       repeat: -1,
       callback: () => {
         this.frustrationBar.increaseHealth(Constants.HEALTH_DECREASE_RATE)
       },
-      delay: 250,
+      delay: Math.max(25, 250 - booksFinished * 10),
     })
     this.frustrationBar.setOnLoseAllHealthHandler(() => {
       this.game.onGameOver()
