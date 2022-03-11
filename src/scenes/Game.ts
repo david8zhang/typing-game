@@ -50,7 +50,9 @@ export default class Game extends Phaser.Scene {
   }
 
   onGameOver() {
-    this.scene.start('game-over')
+    this.scene.start('game-over', {
+      booksFinished: this.booksFinished,
+    })
   }
 
   update() {
