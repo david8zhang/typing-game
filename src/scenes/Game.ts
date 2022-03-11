@@ -27,9 +27,9 @@ export default class Game extends Phaser.Scene {
       TextGenerator.generateText(5 * (this.booksFinished + 1))
     )
     this.fanMeter = new FanMeter(this, this.booksFinished)
-    this.inputHandler.addOnNextWordHandler((isCorrect: boolean) => {
-      if (isCorrect) {
-        this.fanMeter.decreasePoints(Constants.CORRECT_WORD_SCORE)
+    this.inputHandler.addOnNextWordHandler((wordTyped: string, wordToType: string) => {
+      if (wordTyped === wordToType) {
+        this.fanMeter.decreasePoints(wordTyped.length)
       }
     })
     this.inputHandler.addOnFinishedBookHandler((wordsTyped: string[], textCorpus: string[]) => {
@@ -37,6 +37,7 @@ export default class Game extends Phaser.Scene {
         wordsTyped,
         textCorpus,
         secondsPassed: this.secondsPassed,
+        booksFinished: this.booksFinished,
       })
     })
     this.time.addEvent({

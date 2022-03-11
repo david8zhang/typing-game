@@ -22,7 +22,7 @@ export class FanMeter {
     this.frustrationEvent = this.game.time.addEvent({
       repeat: -1,
       callback: () => {
-        this.frustrationBar.increaseHealth(Constants.HEALTH_DECREASE_RATE)
+        this.frustrationBar.increaseHealth(Math.round(Math.log2(booksFinished + 1)))
       },
       delay: Math.max(25, 250 - booksFinished * 10),
     })

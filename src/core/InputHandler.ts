@@ -187,7 +187,7 @@ export class InputHandler {
       this.updateWordCount()
       this.typedWords.push(prevWordTyped)
       this.onNextWordHandlers.forEach((handler) => {
-        handler(prevWordToType === prevWordTyped)
+        handler(prevWordToType, prevWordTyped)
       })
     } else {
       this.typedWords.push(prevWordTyped)
